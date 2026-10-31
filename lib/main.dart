@@ -231,8 +231,8 @@ class _MeshMonitorMainScreenState extends State<MeshMonitorMainScreen> {
             'Showing what its older endpoints report; update the daemon for the full dashboard.';
         break;
       case HubState.unauthorized:
-        text = 'The hub refused the token (HTTP 401). Open Hub settings and paste the token from the hub\'s '
-            '~/.omni/hub_token.';
+        text = 'The hub refused the token (HTTP 401). Open Hub settings and paste the token from '
+            'Omni Node > Connect apps (this phone) or the hub\'s ~/.omni/hub_token.';
         break;
       case HubState.forbidden:
         text = 'The hub is up but not serving remote phones (HTTP 403). Start it with OMNI_HUB_REMOTE=1 and '
@@ -419,7 +419,7 @@ class _HubSettingsDialogState extends State<_HubSettingsDialog> {
       return;
     }
     if (_token.text.trim().isEmpty) {
-      setState(() => _error = 'A remote hub needs its token (~/.omni/hub_token on the hub)');
+      setState(() => _error = 'A remote hub needs its token (Omni Node > Connect apps, or ~/.omni/hub_token on the hub)');
       return;
     }
     Navigator.pop(context, MonitorHubSettings(
@@ -489,6 +489,7 @@ class _HubSettingsDialogState extends State<_HubSettingsDialog> {
                 enableSuggestions: false,
                 decoration: InputDecoration(
                   labelText: 'Hub token',
+                  helperText: 'Omni Node on this phone: Connect apps > Copy token',
                   suffixIcon: IconButton(
                     icon: Icon(_showToken ? Icons.visibility_off : Icons.visibility),
                     onPressed: () => setState(() => _showToken = !_showToken),
