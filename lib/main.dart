@@ -147,8 +147,8 @@ class _MeshMonitorMainScreenState extends State<MeshMonitorMainScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Omniverse Mesh Monitor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            Text(_subtitle(snap), style: TextStyle(color: _headerColor(snap), fontSize: 10, letterSpacing: 0.5)),
+            const Text('Omniverse Mesh Monitor', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(_subtitle(snap), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: _headerColor(snap), fontSize: 10, letterSpacing: 0.5)),
           ],
         ),
         actions: [
