@@ -22,7 +22,11 @@ import 'omni_mesh_telemetry.dart';
 /// name what would feed them (see omni_mesh_telemetry.dart).
 /// ============================================================================
 
-void main() => runApp(const MobileMeshMonitorApp());
+void main() {
+  // Updates: ask the Omni Node on this phone first, with its token from Hub settings.
+  OmniOta.localTokenProvider = MonitorHubSettingsStore.localNodeToken;
+  runApp(const MobileMeshMonitorApp());
+}
 
 class MobileMeshMonitorApp extends StatelessWidget {
   const MobileMeshMonitorApp({super.key});
