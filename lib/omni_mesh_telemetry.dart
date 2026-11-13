@@ -319,8 +319,6 @@ int compareVersions(String a, String b) {
 const List<TelemetryTile> kNotWiredProtocols = [
   TelemetryTile.notWired('GossipSub pub/sub',
       'Admin/omni_gossipsub_swarm_router.py exists but the daemon does not run it; events relay over HTTP /p2p/sync'),
-  TelemetryTile.notWired('BLE discovery',
-      'Admin/omni_ble_discovery_engine.py exists but is not wired into the daemon; discovery is UDP LAN beacons only'),
   TelemetryTile.notWired('NAT hole punching',
       'Admin/omni_ice_cgnat_hole_puncher.py is not wired in; remote phones reach the hub over Tailscale'),
   TelemetryTile.notWired('OmniCast call media (WebRTC)',
@@ -558,6 +556,13 @@ TelemetryTile _protocolTile(Map<String, dynamic> p) {
                 'rejected ${fmtInt(_int(counts['rejected_signature']) + _int(counts['rejected_mesh']))}',
             if (prefixes.isNotEmpty) 'peers ${prefixes.map((e) => '$e…').join(', ')}',
           ].where((e) => e.isNotEmpty).join(' • '));
+    case 'ble_discovery':
+      // Daemon 8.32+ runs the BLE engine: the summary carries the nearby registry plus the
+      // met store (introductions accepted / rejected / stored). met_rejected needs 8.33.1+;
+      // on older hubs fmtInt says "not reported" rather than inventing a zero.
+      return TelemetryTile(name, '${fmtInt(p['nearby'])} nearby • ${fmtInt(counts['met'])} met', status,
+          detail: '$seen • introductions ${fmtInt(counts['met_accepted'])} accepted / '
+              '${fmtInt(counts['met_rejected'])} rejected • ${fmtInt(counts['reports'])} sighting reports');
     case 'negentropy':
       final run = p['last_run'] is Map<String, dynamic> ? p['last_run'] as Map<String, dynamic> : null;
       return TelemetryTile(
@@ -596,6 +601,8 @@ List<TelemetrySection> _legacySections(HubSnapshot snap, String appBuild) {
 
   final catchup = _map(h['catchup']);
   final runs = (catchup['peers'] as List?) ?? const [];
+  final ble = _map(h['ble']);
+  final bleMet = _map(ble['met']);
   final protocols = <TelemetryTile>[
     upgrade,
     const TelemetryTile('TCP app API', 'answering', TileStatus.ok),
@@ -605,6 +612,12 @@ List<TelemetrySection> _legacySections(HubSnapshot snap, String appBuild) {
           _int(h['active_peers']) > 0 ? TileStatus.ok : TileStatus.idle),
       TelemetryTile('Catch-up sync (negentropy)', catchup.isEmpty ? 'no run reported' : '${runs.length} peers in last run',
           catchup.isEmpty ? TileStatus.idle : TileStatus.ok),
+      if (ble.isNotEmpty)
+        TelemetryTile('BLE discovery (0xFFA0, proximity only)',
+            '${fmtInt(ble['nearby'])} nearby • ${fmtInt(bleMet['count'])} met',
+            _int(bleMet['count']) > 0 ? TileStatus.ok : TileStatus.idle,
+            detail: 'last seen ${fmtAgo(ble['last_seen_ago_s'])} • introductions '
+                '${fmtInt(bleMet['accepted'])} accepted / ${fmtInt(bleMet['rejected'])} rejected'),
     ],
     const TelemetryTile('Signaling / TURN', _needs, TileStatus.unknown),
     ...kNotWiredProtocols,
