@@ -320,7 +320,7 @@ const List<TelemetryTile> kNotWiredProtocols = [
   TelemetryTile.notWired('GossipSub pub/sub',
       'Admin/omni_gossipsub_swarm_router.py exists but the daemon does not run it; events relay over HTTP /p2p/sync'),
   TelemetryTile.notWired('NAT hole punching',
-      'Admin/omni_ice_cgnat_hole_puncher.py is not wired in; remote phones reach the hub over Tailscale'),
+      'Admin/omni_ice_cgnat_hole_puncher.py is not wired in; nodes behind NAT meet through a reachable relay peer'),
   TelemetryTile.notWired('OmniCast call media (WebRTC)',
       'Only the signaling mailbox is live; a call-media stats feed from the apps would fill this'),
 ];
